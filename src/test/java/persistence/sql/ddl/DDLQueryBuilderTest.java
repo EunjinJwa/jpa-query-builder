@@ -16,7 +16,7 @@ class DDLQueryBuilderTest {
     private DDLQueryBuilder ddlQueryBuilder = DDLQueryBuilder.getInstance();
 
     @Test
-    @DisplayName("CreateTableQuery_id,name,age")
+    @DisplayName("CreateTableQuery_@Id필드에대한 primaryKey 쿼리 생성")
     void createTableQueryReq1() {
         String query = ddlQueryBuilder.createTableQuery(Person1.class);
 
@@ -24,7 +24,7 @@ class DDLQueryBuilderTest {
     }
 
     @Test
-    @DisplayName("CreateTableQuery_id,name,age,email")
+    @DisplayName("CreateTableQuery_@Column 필드의 컬럼 생성, @GeneratedValue필드의 AUTO_INCREMENT 쿼리 생성")
     void createTableQueryReq2() {
         String query = ddlQueryBuilder.createTableQuery(Person2.class);
 
@@ -32,7 +32,7 @@ class DDLQueryBuilderTest {
     }
 
     @Test
-    @DisplayName("CreateTableQuery_@Transient제외_id,name,age,email")
+    @DisplayName("CreateTableQuery_@Transient필드는 insert쿼리에서 제외")
     void createTableQueryReq3() {
         String query = ddlQueryBuilder.createTableQuery(Person.class);
 
@@ -40,7 +40,7 @@ class DDLQueryBuilderTest {
     }
 
     @Test
-    @DisplayName("DropTableQuery")
+    @DisplayName("DropTableQuery_테이블 삭제 쿼리 생성")
     void dropTableQuery() {
         String query = ddlQueryBuilder.dropTableQuery(Person.class);
 

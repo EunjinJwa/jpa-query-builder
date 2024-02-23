@@ -19,10 +19,6 @@ public class EntityFieldInspector {
                 field.getAnnotation(Column.class).name() : field.getName();
     }
 
-    public static EntityColumnType getColumnType(Field field) {
-        return EntityColumnType.get(field.getType());
-    }
-
     public static boolean isNullable(Field field) {
         return !field.isAnnotationPresent(Column.class) || field.getAnnotation(Column.class).nullable();
     }

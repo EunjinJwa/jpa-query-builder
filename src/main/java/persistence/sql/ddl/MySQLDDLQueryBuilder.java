@@ -4,20 +4,19 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;
 import persistence.inspector.EntityInfoExtractor;
+import persistence.sql.dml.DMLQueryBuilder;
+import persistence.sql.dml.DMLQueryFormatter;
 
-public class DDLQueryBuilder {
+public class MySQLDDLQueryBuilder implements DDLQueryBuilderIf {
 
+    private final MySQLDDLQueryConstructor queryConstructor = new MySQLDDLQueryConstructor();
 
-    private DDLQueryBuilder() {
-    }
+    @Override
+    public String createTableQuery(EntityTable entityTable) {
 
-    public static DDLQueryBuilder getInstance() {
-        return new MySQLDDLQueryBuilder();
-    }
+        DDLQueryFormatter.createTableQuery(entityTable.getTableName());
 
-    public String createTableQuery(Class<?> clazz) {
-
-        return createTableQuery(getTableName(clazz), createColumnClause(clazz), createPrimaryKeyClause(clazz));
+        return createTableQuery(entityTable.getTableName(), createColumnClause(clazz), createPrimaryKeyClause(clazz));
     }
 
     private String createTableQuery(String tableName, String columnClause, String primaryKeyClause) {
@@ -25,9 +24,10 @@ public class DDLQueryBuilder {
         return String.format("CREATE TABLE %s (%s%s)", tableName, columnClause, primaryKeyClause);
     }
 
-    public String dropTableQuery(Class<?> clazz) {
+    @Override
+    public String dropTableQuery(EntityTable entityTable) {
 
-        return createDropTableQuery(getTableName(clazz));
+        return createDropTableQuery(getTableName(entityTable));
     }
 
     private String createDropTableQuery(String tableName) {

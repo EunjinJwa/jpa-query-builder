@@ -1,5 +1,7 @@
 package persistence.inspector;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -9,15 +11,26 @@ import java.util.stream.Collectors;
 
 public class EntityInfoExtractor {
 
+    public static List<Field> getEntityFields(Class<?> clazz) {
+        try {
+            return ClsssMetadataInspector.getFields(clazz);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
     public static List<Field> getEntityFieldsForInsert(Class<?> clazz) {
         try {
 
-            return ClsssMetadataInspector.getFields(clazz).stream()
+            return getEntityFields(clazz).stream()
                     .filter(EntityInfoExtractor::isInsertTargetField)
                     .collect(Collectors.toList());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static EntityColumnType getColumnType(Field field) {
+        return EntityColumnType.get(field.getType());
     }
 
     private static boolean isInsertTargetField(Field field) {
@@ -46,10 +59,6 @@ public class EntityInfoExtractor {
                 .findFirst().orElse(null);
     }
 
-    public static boolean isPrimaryKey(Field id) {
-        return EntityFieldInspector.hasAnnotation(id, Id.class);
-    }
-
     public static Object getFieldValue(Object object, Field field) {
         try {
             field.setAccessible(true);
@@ -58,4 +67,20 @@ public class EntityInfoExtractor {
             throw new RuntimeException(e);
         }
     }
+
+    public static boolean isNullable(Field field) {
+        return EntityFieldInspector.hasAnnotation(field, Column.class) && field.getAnnotation(Column.class).nullable();
+    }
+
+    public static boolean isPrimaryKey(Field field) {
+        return field.isAnnotationPresent(Id.class);
+    }
+
+    public static boolean isAutoIncrement(Field field) {
+        return EntityFieldInspector.hasAnnotation(field, GeneratedValue.class);
+    }
+
+
+
+
 }
